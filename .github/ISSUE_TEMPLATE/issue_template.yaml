@@ -1,0 +1,46 @@
+name: Issue
+description: This is a template for issue creation
+labels: ["REST-API", "urg:low", "stat:wait_for_ack"]
+title: "[ISSUE]: "
+body:
+- type: dropdown
+  id: issue-type
+  attributes:
+    label: Type of Issue
+    description: What is the issue type?
+    multiple: false
+    options:
+      - Build
+      - Bug
+      - Documentation
+      - Feature
+      - Preformance
+  validations:
+    required: true
+- type: textarea
+  id: issue-description
+  attributes:
+    label: Description of Issue
+    description: What is the issue to be addressed?
+    placeholder: Give code ideas or places to start if applicable
+    render: shell
+  validations:
+    required: true
+- type: checkboxes
+  id: critical
+  attributes:
+    label: Is this a stalled or critical issue?
+    description: A stalled issue is one that is currently awaiting the artificats of another
+    options:
+      - label: Critical
+        required: false
+      - label: Stalled
+        required: false
+- type: input
+  id: connected-issue
+  attributes:
+    label: What is the connected issue?
+    placeholder: Ex. #00001
+  validations:
+    required: false
+  
