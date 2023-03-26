@@ -8,6 +8,8 @@ use chrono::{DateTime, Utc};
 use uuid::Uuid;
 use crate::response::Response;
 
+use std;
+
 pub type Resp = Response<R>;
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -80,4 +82,9 @@ pub async fn delete(_path: Path<(String,)>) -> HttpResponse {
         .content_type(APPLICATION_JSON)
         .await
         .unwrap()
+}
+
+#[get("/shutdown")]
+pub async fn shutdown() -> HttpResponse {
+    std::process::exit(0);
 }
