@@ -74,7 +74,7 @@ pub async fn get(_path: Path<(String,)>) -> HttpResponse {
 }
 
 #[delete("/delete/{id}")]
-pub async fn delete(_path: Path<(String,)>) -> HttpResponse {
+pub async fn delete() -> HttpResponse {
 
     HttpResponse::NoContent()
         .content_type(APPLICATION_JSON)
