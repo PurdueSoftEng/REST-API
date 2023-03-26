@@ -26,11 +26,9 @@ jobs:
       run: cargo run --verbose
   test:
     runs-on: ubuntu-latest
-    needs: build
     steps:
     - uses: actions/checkout@v3
     - name: Run tests
-      run: ./test/test.sh
-      shell: bash
+      run: bash test/test.sh
   
 
