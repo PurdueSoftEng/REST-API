@@ -3,7 +3,7 @@
 curl -s http://localhost:9090/get
 res=$?
 until test "$res" == "0"; do
-   curl -s http://localhost:9090/get
+   curl http://localhost:9090/get
    res=$?
 done
 
