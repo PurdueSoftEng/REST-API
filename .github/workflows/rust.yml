@@ -21,6 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
+    - uses: actions/checkout@v3
     - name: Launch server
       run: cargo run --verbose
   test:
@@ -29,6 +30,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Run tests
-      run: test/test.sh
+      run: ./test/test.sh
+      shell: bash
   
 
