@@ -1,30 +1,38 @@
+#![feature(proc_macro_hygiene, decl_macro)]
+
+extern crate chrono;
 #[macro_use]
-extern crate actix_web;
+extern crate diesel;
+#[macro_use]
+extern crate rocket;
+#[macro_use]
+extern crate rocket_contrib;
+extern crate serde;
+extern crate serde_json;
+#[macro_use]
+extern crate serde_derive;
 
-use std::{env, io};
+pub mod cors;
+pub mod models;
+pub mod routes;
+pub mod schema;
 
-use actix_web::{middleware, App, HttpServer};
+use rocket_contrib::databases;
 
-mod end_point;
-mod constants;
-mod response;
+#[database("app")]
+pub struct DbConn(diesel::MysqlConnection);
 
-#[actix_rt::main]
-async fn main() -> io::Result<()> {
-    env::set_var("RUST_LOG", "actix_web=debug,actix_server=info");
-    env_logger::init();
-
-    HttpServer::new(|| {
-        App::new()
-
-            .wrap(middleware::Logger::default())
-
-            .service(end_point::list)
-            .service(end_point::get)
-            .service(end_point::create)
-            .service(end_point::delete)
-    })
-    .bind("0.0.0.0:9090")?
-    .run()
-    .await
+fn main() {
+    rocket::ignite()
+        .mount(
+            "/",
+            routes![
+                routes::index,
+                routes::create_package,
+                routes::list_packages
+            ],
+        )
+        .attach(DbConn::fairing())
+        .attach(cors::CorsFairing)
+        .launch();
 }
