@@ -15,13 +15,19 @@ RUN cargo build --release
 
 FROM ubuntu:jammy
 
-RUN apt-get update && apt-get install -y libmysqlclient-dev sudo
+RUN apt-get update && apt-get install -y libmysqlclient-dev sudo mysql-server systemctl
 
 RUN useradd -m docker && echo "docker:docker" | chpasswd && adduser docker sudo
 
+RUN grep -v bind-address /etc/mysql/my.cnf > temp.txt && mv temp.txt /etc/mysql/my.cnf
+
 COPY --from=builder \
-  /target/release/tool-app \
+  /target/release/rocket-app \
   /usr/local/bin/
 
+ENV PORT 8080
+
+EXPOSE 8080
+
 WORKDIR /root
-CMD ROCKET_PORT=8080 /usr/local/bin/tool-app
+CMD /etc/init.d/mysql start && echo "CREATE USER 'rocket'@'%' IDENTIFIED BY 'password'; CREATE DATABASE app; GRANT ALL PRIVILEGES ON *.* TO 'rocket' WITH GRANT OPTION;" | sudo mysql && ROCKET_PORT=$PORT /usr/local/bin/rocket-app
