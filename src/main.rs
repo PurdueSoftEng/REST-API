@@ -18,9 +18,10 @@ pub mod routes;
 pub mod schema;
 
 use rocket_contrib::databases;
+use rocket_contrib::databases::diesel::pg;
 
 #[database("app")]
-pub struct DbConn(diesel::MysqlConnection);
+pub struct DbConn(pg::PgConnection);
 
 fn main() {
     rocket::ignite()

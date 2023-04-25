@@ -1,6 +1,6 @@
-DROP TABLE `app`.`packages`;
-DROP TABLE `app`.`groups`;
-DROP TABLE `app`.`users`;
-DROP TABLE `app`.`requests`;
-DROP TABLE `app`.`history_log`;
-DROP TABLE `app`.`registry`;
+DROP TABLE packages;
+DROP TABLE groups;
+DROP TABLE users;
+DROP TABLE requests;
+DROP TABLE history_log;
+DROP TABLE registry;
