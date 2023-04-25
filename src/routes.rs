@@ -2,7 +2,7 @@ use diesel::{self, prelude::*};
 
 use rocket_contrib::json::Json;
 
-use crate::models::{InsertablePackage, PackageView};
+use crate::models::{InsertablePackage, PackageView, InsertableGroup, GroupView};
 use crate::schema;
 use crate::DbConn;
 
