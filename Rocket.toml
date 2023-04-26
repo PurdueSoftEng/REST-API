@@ -1,3 +1,2 @@
-
 [global.databases]
 app = { url = "postgres://postgres:password@localhost/app" }

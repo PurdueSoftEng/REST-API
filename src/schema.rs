@@ -13,6 +13,7 @@ diesel::table! {
         time_stamp -> Nullable<Timestamp>,
         group_id -> Int4,
         package_id -> Int4,
+        request_id -> Int4,
     }
 }
 
@@ -35,7 +36,7 @@ diesel::table! {
 diesel::table! {
     registry (registry_id) {
         registry_id -> Int4,
-        request_id -> Int4,
+        group_id -> Int4,
         package_id -> Int4,
         user_id -> Int4,
     }
@@ -54,6 +55,13 @@ diesel::table! {
         user_name -> Varchar,
     }
 }
+
+diesel::joinable!(history_log -> groups (group_id));
+diesel::joinable!(history_log -> packages (package_id));
+diesel::joinable!(history_log -> requests (request_id));
+diesel::joinable!(registry -> groups (group_id));
+diesel::joinable!(registry -> packages (package_id));
+diesel::joinable!(registry -> users (user_id));
 
 diesel::allow_tables_to_appear_in_same_query!(
     groups,

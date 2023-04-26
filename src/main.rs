@@ -12,28 +12,36 @@ extern crate serde_json;
 #[macro_use]
 extern crate serde_derive;
 
+#[cfg(test)] mod tests;
+
 pub mod cors;
 pub mod models;
 pub mod routes;
 pub mod schema;
 
-use rocket_contrib::databases;
 use rocket_contrib::databases::diesel::pg;
 
 #[database("app")]
 pub struct DbConn(pg::PgConnection);
 
-fn main() {
+fn rocket() -> rocket::Rocket
+{
     rocket::ignite()
         .mount(
             "/",
             routes![
                 routes::index,
+                routes::hello,
                 routes::create_package,
-                routes::list_packages
+                routes::list_packages,
+                routes::create_group,
+                routes::list_groups
             ],
         )
         .attach(DbConn::fairing())
         .attach(cors::CorsFairing)
-        .launch();
+}
+
+fn main() {
+    rocket().launch();
 }

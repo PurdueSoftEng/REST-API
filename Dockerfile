@@ -1,7 +1,8 @@
 FROM ubuntu:jammy AS builder
 
-# You'll need to change `libmysqlclient-dev` to `libpq-dev` if you're using Postgres
-RUN apt-get update && apt-get install -y curl postgresql postgresql-client build-essential
+# Install dependencies
+RUN apt-get update && apt-get install -y curl libpq5 libpq-dev build-essential
+RUN apt-get update && apt-get install -y software-properties-common python3 pkg-config
 
 # Install rust
 RUN curl https://sh.rustup.rs/ -sSf | \
@@ -13,21 +14,25 @@ ADD . ./
 
 RUN cargo build --release
 
-FROM ubuntu:jammy
+FROM ubuntu:jammy as base
 
-RUN apt-get update && apt-get install -y postgresql-client sudo systemctl
+# Install dependencies
+RUN apt-get update && apt-get install -y libpq5 libpq-dev 
+RUN apt-get update && apt-get install -y sudo 
+RUN apt-get update && apt-get install -y software-properties-common python3 pkg-config
 
+# Setup sudo
 RUN useradd -m docker && echo "docker:docker" | chpasswd && adduser docker sudo
 
-#RUN grep -v bind-address /etc/mysql/my.cnf > temp.txt && mv temp.txt /etc/mysql/my.cnf
-
+# Install binary
 COPY --from=builder \
   /target/release/tool-app \
   /usr/local/bin/
 
-ENV PORT 8080
-
-EXPOSE 8080
-
+FROM base as prodcution
 WORKDIR /root
-#CMD /etc/init.d/mysql start && echo "CREATE USER 'rocket'@'%' IDENTIFIED BY 'password'; CREATE DATABASE app; GRANT ALL PRIVILEGES ON *.* TO 'rocket' WITH GRANT OPTION;" | sudo mysql && ROCKET_PORT=$PORT /usr/local/bin/tool-app
+CMD ROCKET_PORT=$PORT /usr/local/bin/tool-app
+
+FROM base as test
+WORKDIR /root
+CMD ROCKET_PORT=$PORT /usr/local/bin/tool-app
