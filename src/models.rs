@@ -1,5 +1,3 @@
-use chrono::NaiveDateTime;
-
 use crate::schema::{packages, groups};
 
 #[derive(Serialize, Deserialize, Queryable)]
