@@ -1,8 +1,8 @@
-use crate::schema::{packages, groups};
+use crate::schema::{packages, groups, users, requests};
 
 #[derive(Serialize, Deserialize, Queryable)]
 pub struct PackageView {
-    pub id: i32,
+    pub package_id: i32,
     pub link: String,
     pub package_name: String,
     pub metric_one: i32,
@@ -33,7 +33,7 @@ pub struct InsertablePackage {
 
 #[derive(Serialize, Deserialize, Queryable)]
 pub struct GroupView {
-    pub id: i32,
+    pub group_id: i32,
     pub group_name: String,
 }
 
@@ -43,4 +43,26 @@ pub struct InsertableGroup {
     pub group_name: String,
 }
 
+#[derive(Serialize, Deserialize, Queryable)]
+pub struct UserView {
+    pub user_id: i32,
+    pub group_name: String,
+}
 
+#[derive(Deserialize, Insertable)]
+#[table_name = "users"]
+pub struct InsertableUser {
+    pub user_name: String,
+}
+
+#[derive(Serialize, Deserialize, Queryable)]
+pub struct RequestView {
+    pub request_id: i32,
+    pub request_type: String,
+}
+
+#[derive(Deserialize, Insertable)]
+#[table_name = "requests"]
+pub struct InsertableRequest {
+    pub request_type: String,
+}
