@@ -9,24 +9,31 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
+  GITHUB_TOKEN: ${{ github.token }}
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
+    - name: Checkout Metrics
+    - uses: space-wizards/submodule-dependency@v0.1.5
+    - uses: snickerbockers/submodules-init@v4
     - uses: dtolnay/rust-toolchain@nightly
     - name: Build
       run: cargo build --verbose
-    - name: Run tests
+    - name: Run Tests
       run: cargo test --verbose
   build-release:
     runs-on: ubuntu-latest
     needs: build
     steps:
     - uses: actions/checkout@v3
+    - name: Checkout Metrics
+    - uses: space-wizards/submodule-dependency@v0.1.5
+    - uses: snickerbockers/submodules-init@v4
     - uses: dtolnay/rust-toolchain@nightly
-    - name: Build
+    - name: Build Release
       run: cargo build --verbose --release
   
 
