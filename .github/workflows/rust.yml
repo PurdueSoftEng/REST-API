@@ -19,6 +19,8 @@ jobs:
     - uses: snickerbockers/submodules-init@v4
     - uses: dtolnay/rust-toolchain@nightly
     - uses: ikalnytskyi/action-setup-postgres@v4
+    - name: Get Diesel
+      run: cargo install diesel_cli --no-default-features --features postgres
     - name: Build
       run: cargo build --verbose
     - name: Run Tests
