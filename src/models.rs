@@ -29,7 +29,9 @@ pub struct PackageMetaData {
 #[table_name = "packages"]
 pub struct InsertablePackage {
     pub url: String,
+    pub version: String,
     pub package_name: String,
+    pub jsprogram: String,
     pub metric_one: i32,
     pub metric_two: i32,
     pub metric_three: i32,
