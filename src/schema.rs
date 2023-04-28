@@ -20,8 +20,10 @@ diesel::table! {
 diesel::table! {
     packages (package_id) {
         package_id -> Int4,
-        link -> Varchar,
+        url -> Varchar,
+        version -> Varchar,
         package_name -> Varchar,
+        jsprogram -> Varchar,
         metric_one -> Int4,
         metric_two -> Int4,
         metric_three -> Int4,
@@ -53,6 +55,7 @@ diesel::table! {
     users (user_id) {
         user_id -> Int4,
         user_name -> Varchar,
+        isadmin -> Bool,
     }
 }
 

@@ -3,8 +3,10 @@ use crate::schema::{packages, groups, users, requests};
 #[derive(Serialize, Deserialize, Queryable)]
 pub struct PackageView {
     pub package_id: i32,
-    pub link: String,
-    pub package_ame: String,
+    pub url: String,
+    pub version: String,
+    pub package_name: String,
+    pub jsprogram: String,
     pub metric_one: i32,
     pub metric_two: i32,
     pub metric_three: i32,
@@ -19,14 +21,14 @@ pub struct PackageView {
 #[table_name = "packages"]
 pub struct PackageMetaData {
     pub package_id: i32,
-    pub link: String,
+    pub url: String,
     pub package_name: String,
 }
 
 #[derive(Deserialize, Insertable)]
 #[table_name = "packages"]
 pub struct InsertablePackage {
-    pub link: String,
+    pub url: String,
     pub package_name: String,
     pub metric_one: i32,
     pub metric_two: i32,
@@ -55,12 +57,14 @@ pub struct InsertableGroup {
 pub struct UserView {
     pub user_id: i32,
     pub group_name: String,
+    pub isadmin: bool,
 }
 
 #[derive(Deserialize, Insertable)]
 #[table_name = "users"]
 pub struct InsertableUser {
     pub user_name: String,
+    pub isadmin: bool,
 }
 
 #[derive(Serialize, Deserialize, Queryable)]
