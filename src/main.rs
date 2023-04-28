@@ -4,6 +4,8 @@ extern crate chrono;
 #[macro_use]
 extern crate diesel;
 #[macro_use]
+extern crate diesel_derives;
+#[macro_use]
 extern crate rocket;
 #[macro_use]
 extern crate rocket_contrib;
@@ -34,6 +36,8 @@ fn rocket() -> rocket::Rocket
                 routes::hello,
                 routes::create_package,
                 routes::list_packages,
+                routes::get_package,
+                routes::update_package,
                 routes::create_group,
                 routes::list_groups
             ],

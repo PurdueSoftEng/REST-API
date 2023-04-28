@@ -1,7 +1,9 @@
 CREATE TABLE packages (
   package_id SERIAL,
-  link VARCHAR NOT NULL,
+  url VARCHAR NOT NULL,
+  version VARCHAR NOT NULL,
   package_name VARCHAR NOT NULL,
+  jsprogram VARCHAR NOT NULL,
   metric_one INT NOT NULL,
   metric_two INT NOT NULL,
   metric_three INT NOT NULL,
@@ -16,6 +18,7 @@ CREATE TABLE packages (
 CREATE TABLE users (
   user_id SERIAL,
   user_name VARCHAR NOT NULL,
+  isAdmin BOOLEAN NOT NULL,
   PRIMARY KEY(user_id)
 );
 

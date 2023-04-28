@@ -4,7 +4,7 @@ use crate::schema::{packages, groups, users, requests};
 pub struct PackageView {
     pub package_id: i32,
     pub link: String,
-    pub package_name: String,
+    pub package_ame: String,
     pub metric_one: i32,
     pub metric_two: i32,
     pub metric_three: i32,
@@ -13,6 +13,14 @@ pub struct PackageView {
     pub metric_six: i32,
     pub metric_seven: i32,
     pub total_score: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Queryable, QueryableByName)]
+#[table_name = "packages"]
+pub struct PackageMetaData {
+    pub package_id: i32,
+    pub link: String,
+    pub package_name: String,
 }
 
 #[derive(Deserialize, Insertable)]

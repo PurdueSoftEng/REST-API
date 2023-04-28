@@ -14,7 +14,7 @@ ADD . ./
 
 RUN cargo build --release
 
-FROM ubuntu:jammy as base
+FROM ubuntu:jammy
 
 # Install dependencies
 RUN apt-get update && apt-get install -y libpq5 libpq-dev 
@@ -29,10 +29,7 @@ COPY --from=builder \
   /target/release/tool-app \
   /usr/local/bin/
 
-FROM base as prodcution
-WORKDIR /root
-CMD ROCKET_PORT=$PORT /usr/local/bin/tool-app
+ENV PORT 8080
 
-FROM base as test
 WORKDIR /root
 CMD ROCKET_PORT=$PORT /usr/local/bin/tool-app
