@@ -1,3 +1,3 @@
 [submodule "metrics"]
 	path = metrics
-	url = https://github.com/PurdueSoftEng/Part2CLI-Tool.git
+	url = https://github.com/PurdueSoftEng/Metrics.git

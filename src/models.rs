@@ -7,6 +7,7 @@ pub struct PackageView {
     pub version: String,
     pub package_name: String,
     pub jsprogram: String,
+    pub content: String,
     pub metric_one: i32,
     pub metric_two: i32,
     pub metric_three: i32,
@@ -19,10 +20,17 @@ pub struct PackageView {
 
 #[derive(Debug, Serialize, Deserialize, Queryable, QueryableByName)]
 #[table_name = "packages"]
+pub struct PackageData {
+    pub package_id: i32,
+    pub content: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Queryable, QueryableByName)]
+#[table_name = "packages"]
 pub struct PackageMetaData {
     pub package_id: i32,
-    pub url: String,
     pub package_name: String,
+    pub version: String,
 }
 
 #[derive(Deserialize, Insertable)]
