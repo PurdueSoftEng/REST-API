@@ -9,7 +9,9 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
-
+  DATABASE_URL: $DATABASE_URL_LOCAL
+  ROCKET_DATABASES: $ROCKET_DATABASES_LOCAL
+  
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -21,6 +23,10 @@ jobs:
     - uses: ikalnytskyi/action-setup-postgres@v4
     - name: Get Diesel
       run: cargo install diesel_cli --no-default-features --features postgres
+    - name: Setup Diesel
+      run: diesel setup
+    - name: Run Migration
+      run: diesel migration run
     - name: Build
       run: cargo build --verbose
     - name: Run Tests
