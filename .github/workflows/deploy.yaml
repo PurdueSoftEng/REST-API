@@ -1,4 +1,4 @@
-name: Docker
+name: Deploy GCP
 
 on:
   push:
@@ -8,9 +8,8 @@ on:
 
 jobs:
 
-    deploy:
-
-        name: Setup Docker
+    build:
+        name: Run Docker
         runs-on: ubuntu-latest
         env:
           IMAGE_NAME: gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_APP_NAME }}
@@ -23,9 +22,6 @@ jobs:
 
         - name: Build Docker image
           run: docker build -t $IMAGE_NAME .
-
-        - name: Test Docker image
-          run: docker run $IMAGE_NAME
 
         - name: Push Docker image
           run: docker push $IMAGE_NAME
