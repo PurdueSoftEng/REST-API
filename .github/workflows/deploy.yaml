@@ -11,6 +11,7 @@ jobs:
     build:
         name: Run Docker
         runs-on: ubuntu-latest
+        environment: test
         env:
           IMAGE_NAME: gcr.io/${{secrets.GCP_PROJECT_ID}}/${{secrets.GCP_APP_NAME}}
           ACCOUNT: ${{secrets.GCP_ACCOUNT_NAME}}@${{secrets.GCP_PROJECT_ID}}.iam.gserviceaccount.com
@@ -38,7 +39,7 @@ jobs:
           run: docker push $IMAGE_NAME
         
         - name: Deploy Docker image
-          run: gcloud run deploy ${{secrets.GCP_PROJECT_ID}} --image $IMAGE_NAME --region us-central1 --platform managed
+          run: gcloud run deploy ${{secrets.GCP_PROJECT_ID}} --set-env-vars "ROCKET_DATABASES=${{env.ROCKET_DATABASES}} --image $IMAGE_NAME --region us-central1 --platform managed
         
         
           
