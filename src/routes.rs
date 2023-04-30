@@ -3,10 +3,16 @@ use diesel::{self, prelude::*};
 
 use rocket_contrib::json::Json;
 
-use crate::models::{InsertablePackage, PackageView, PackageMetaData, InsertableGroup, GroupView, self};
+use crate::models::*;
 use crate::schema::{self, packages, groups, users};
 use crate::DbConn;
 use std::vec::Vec;
+use metrics::calcscore;
+use zip::read;
+use base64::{Engine as _, engine::general_purpose};
+use std::io::Read;
+use std::io::Cursor;
+
 
 #[get("/")]
 pub fn index() -> &'static str {
@@ -17,22 +23,43 @@ pub fn index() -> &'static str {
 pub fn hello() -> &'static str {
     "Hello, world!"
 }
-
-#[post("/package", data = "<package>")]
-pub fn create_package(
+//general_purpose::STANDARD_NO_PAD.decode(string).unwrap()
+#[post("/packages", data = "<package>")]
+pub fn create_packages(
     conn: DbConn,
-    package: Json<InsertablePackage>,
+    package: Json<PackageQuery>,
 ) -> Result<String, String> {
     use crate::schema::packages::dsl::*;
+    let insertable_package = InsertablePackage{package_name: package.Name.clone(), version: package.Version.clone()};
     let inserted_rows = diesel::insert_into(packages)
-        .values(&package.0)
+        .values(&insertable_package)
         .execute(&conn.0)
         .map_err(|err| -> String {
             println!("Error inserting row: {:?}", err);
             "Error inserting row into database".into()
         })?;
-
+    
+    
     Ok(format!("Inserted {} row(s).", inserted_rows))
+}
+
+#[post("/package", data = "<package>")]
+pub fn create_package(
+    conn: DbConn,
+    package: Json<PackageData>,
+) -> Result<String, String> {
+    use crate::schema::packages::dsl::*;
+    let binding = package.Content.clone().unwrap();
+    let mut wrapped_reader = Cursor::new(binding.as_bytes());
+    let mut decoder = base64::read::DecoderReader::new(
+        &mut wrapped_reader,
+        &general_purpose::STANDARD_NO_PAD);
+
+    // handle errors as you normally would
+    let mut result = Vec::new();
+    let decoded1 = decoder.read_to_end(&mut result).unwrap();
+    let decoded = general_purpose::STANDARD_NO_PAD.decode(package.Content.clone().unwrap().as_bytes()).unwrap();
+    Ok(format!("Inserted {} row(s).", decoded.len()))
 }
 
 #[get("/package")]
@@ -48,7 +75,7 @@ pub fn list_packages(conn: DbConn) -> Result<String, String> {
         .map(Json);
     if query.as_ref().unwrap().0.is_empty()
     {
-        Ok(format!("No Packages", ))
+        Ok(format!("No Packages"))
     }
     else
     {
@@ -63,14 +90,29 @@ pub fn list_packages(conn: DbConn) -> Result<String, String> {
 
 #[get("/package/<id>")]
 pub fn get_package(conn: DbConn, id: String) -> Result<String, String>  {
-    let mut result: Json<Vec<PackageMetaData>> = diesel::sql_query("SELECT * FROM packages WHERE package_name=$1").bind::<diesel::sql_types::Text, _>(id.as_str())
+    let mut get_meta: Json<Vec<GetMetaData>> = diesel::sql_query("SELECT * FROM packages WHERE package_name=$1").bind::<diesel::sql_types::Text, _>(id.as_str())
     .get_results(&conn.0)
     .map_err(|err| -> String {
         println!("Error querying package {}: {:?}", id, err);
         "Error querying packages from the database".into()
     })
     .map(Json)?;
-    Ok(format!("found {:?}.", result.0.pop().unwrap()))
+    let get_data: Json<Vec<GetData>> = diesel::sql_query("SELECT * FROM packages WHERE package_name=$1").bind::<diesel::sql_types::Text, _>(id.as_str())
+    .get_results(&conn.0)
+    .map_err(|err| -> String {
+        println!("Error querying package {}: {:?}", id, err);
+        "Error querying packages from the database".into()
+    })
+    .map(Json)?;
+    print!("{:?}", get_data.0);
+    let meta = PackageMetaData{ID: get_meta.0.pop().unwrap().package_id.to_string(), Name: get_meta.0.pop().unwrap().package_name, Version: get_meta.0.pop().unwrap().version};
+    /*if get_data.0.pop().unwrap().content.is_some() && get_data.0.pop().unwrap().jsprogram.is_some() && get_data.0.pop().unwrap().url.is_some()
+    {
+        //let data = PackageData{Content: Some(get_data.0.pop().unwrap().content.unwrap()), URL: Some(get_data.0.pop().unwrap().url.unwrap()), JSProgram: Some(get_data.0.pop().unwrap().jsprogram.unwrap())};        
+    }*/
+    let data1 = PackageData{Content: None, URL: None, JSProgram: None};
+    let pack = Package{metadata: meta, data: data1};
+    Ok(serde_json::to_string(&pack).map(Json).unwrap().0)
 }
 
 #[put("/package/<id>")]

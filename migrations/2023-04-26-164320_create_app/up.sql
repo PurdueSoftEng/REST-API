@@ -1,17 +1,18 @@
 CREATE TABLE packages (
   package_id SERIAL,
-  url VARCHAR NOT NULL,
+  url VARCHAR,
   version VARCHAR NOT NULL,
   package_name VARCHAR NOT NULL,
-  jsprogram VARCHAR NOT NULL,
-  metric_one INT NOT NULL,
-  metric_two INT NOT NULL,
-  metric_three INT NOT NULL,
-  metric_four INT NOT NULL,
-  metric_five INT NOT NULL,
-  metric_six INT NOT NULL,
-  metric_seven INT NOT NULL,
-  total_score INT NOT NULL,
+  jsprogram VARCHAR,
+  content VARCHAR,
+  metric_one REAL,
+  metric_two REAL,
+  metric_three REAL,
+  metric_four REAL,
+  metric_five REAL,
+  metric_six REAL,
+  metric_seven REAL,
+  total_score REAL,
   PRIMARY KEY(package_id)
 );
 

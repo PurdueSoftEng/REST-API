@@ -20,18 +20,19 @@ diesel::table! {
 diesel::table! {
     packages (package_id) {
         package_id -> Int4,
-        url -> Varchar,
+        url -> Nullable<Varchar>,
         version -> Varchar,
         package_name -> Varchar,
-        jsprogram -> Varchar,
-        metric_one -> Int4,
-        metric_two -> Int4,
-        metric_three -> Int4,
-        metric_four -> Int4,
-        metric_five -> Int4,
-        metric_six -> Int4,
-        metric_seven -> Int4,
-        total_score -> Int4,
+        jsprogram -> Nullable<Varchar>,
+        content -> Nullable<Varchar>,
+        metric_one -> Nullable<Float4>,
+        metric_two -> Nullable<Float4>,
+        metric_three -> Nullable<Float4>,
+        metric_four -> Nullable<Float4>,
+        metric_five -> Nullable<Float4>,
+        metric_six -> Nullable<Float4>,
+        metric_seven -> Nullable<Float4>,
+        total_score -> Nullable<Float4>,
     }
 }
 

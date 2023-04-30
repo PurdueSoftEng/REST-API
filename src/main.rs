@@ -13,7 +13,9 @@ extern crate serde;
 extern crate serde_json;
 #[macro_use]
 extern crate serde_derive;
-
+extern crate metrics;
+extern crate base64;
+extern crate zip;
 #[cfg(test)] mod tests;
 
 pub mod cors;
@@ -34,7 +36,7 @@ fn rocket() -> rocket::Rocket
             routes![
                 routes::index,
                 routes::hello,
-                routes::create_package,
+                routes::create_packages,
                 routes::list_packages,
                 routes::get_package,
                 routes::update_package,
