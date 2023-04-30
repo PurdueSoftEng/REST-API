@@ -25,7 +25,7 @@ pub fn hello() -> &'static str {
 }
 //general_purpose::STANDARD_NO_PAD.decode(string).unwrap()
 #[post("/packages", data = "<package>")]
-pub fn create_packages(
+pub fn query_package(
     conn: DbConn,
     package: Json<PackageQuery>,
 ) -> Result<String, String> {
