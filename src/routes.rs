@@ -49,7 +49,7 @@ pub fn create_package(
     package: Json<PackageData>,
 ) -> Result<String, String> {
     use crate::schema::packages::dsl::*;
-    let binding = package.Content.clone().unwrap();
+    /*let binding = package.Content.clone().unwrap();
     let mut wrapped_reader = Cursor::new(binding.as_bytes());
     let mut decoder = base64::read::DecoderReader::new(
         &mut wrapped_reader,
@@ -58,8 +58,39 @@ pub fn create_package(
     // handle errors as you normally would
     let mut result = Vec::new();
     let decoded1 = decoder.read_to_end(&mut result).unwrap();
-    let decoded = general_purpose::STANDARD_NO_PAD.decode(package.Content.clone().unwrap().as_bytes()).unwrap();
-    Ok(format!("Inserted {} row(s).", decoded.len()))
+    let decoded = general_purpose::STANDARD_NO_PAD.decode(package.Content.clone().unwrap().as_bytes()).unwrap();*/
+    if package.Content.is_none() && package.URL.is_some()
+    {
+        let insertable_package1 = InsertablePackageURL{package_name: "Temp Name".to_string(), version: "1.0.0".to_string(), url: Some(package.URL.clone().unwrap_or_default()), jsprogram: Some(package.JSProgram.clone().unwrap_or_default())};
+        let inserted_rows1 = diesel::insert_into(packages)
+        .values(&insertable_package1)
+        .execute(&conn.0)
+        .map_err(|err| -> String {
+            println!("Error inserting row: {:?}", err);
+            "Error inserting row into database".into()
+        })?;
+    
+    
+        Ok(format!("Inserted {} row(s).", inserted_rows1))
+    }
+    else if package.URL.is_none() && package.Content.is_some() 
+    {
+        let insertable_package2 = InsertablePackageContent{package_name: "Temp Name".to_string(), version: "1.0.0".to_string(), content: Some(package.Content.clone().unwrap_or_default()), jsprogram: Some(package.JSProgram.clone().unwrap_or_default())};
+        let inserted_rows2 = diesel::insert_into(packages)
+        .values(&insertable_package2)
+        .execute(&conn.0)
+        .map_err(|err| -> String {
+            println!("Error inserting row: {:?}", err);
+            "Error inserting row into database".into()
+        })?;
+    
+    
+        Ok(format!("Inserted {} row(s).", inserted_rows2))
+    }
+    else 
+    {
+        Err("Invalid Format".to_string())
+    }
 }
 
 #[get("/package")]

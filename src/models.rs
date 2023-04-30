@@ -2,6 +2,8 @@ use diesel::sql_types::Double;
 
 use crate::schema::{packages, groups, users, requests};
 
+use Default;
+
 #[derive(Serialize, Deserialize, Queryable)]
 pub struct PackageView {
     pub package_id: i32,
@@ -69,7 +71,7 @@ pub struct InsertableMetrics {
     pub total_score: f32,
 }
 
-#[derive(Debug, Serialize, Deserialize, QueryableByName)]
+#[derive(Default, Debug, Serialize, Deserialize, QueryableByName)]
 #[table_name = "packages"]
 pub struct GetData {
     #[serde(skip_serializing_if = "Option::is_none")]
