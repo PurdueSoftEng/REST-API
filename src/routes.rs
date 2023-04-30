@@ -16,7 +16,7 @@ use std::io::Cursor;
 
 #[get("/")]
 pub fn index() -> &'static str {
-    "Application successfully started!"
+    "Applicationsuccessfully started!"
 }
 
 #[get("/hello")]
@@ -149,15 +149,19 @@ pub fn get_package(conn: DbConn, id: String) -> Result<String, String>  {
 #[put("/package/<id>", data = "<package>")]
 pub fn update_package(conn: DbConn, id: String, package: Json<Package>,) -> Result<String, String>  {
     use crate::schema::packages::dsl::*;
-    let updated_rows = diesel::update(packages.filter(package_name.eq(id.clone())))
-    .set(package_name.eq("new".to_string()))
+    /*let mut get_res = diesel::sql_query("INSERT INTO packages (package_name, version, content, url, jsprogram) VALUES ($1, $2, $3, $4, $5) ON CONFLICT DO UPDATE SET version=$2 SET url=$4")
+    .bind::<diesel::sql_types::Text, _>(id.as_str())
+    .bind::<diesel::sql_types::Text, _>(package.metadata.Version.as_str())
+    .bind::<diesel::sql_types::Text, _>(package.data.Content.as_str())
+    .bind::<diesel::sql_types::Text, _>(package.data.URL.as_str())
+    .bind::<diesel::sql_types::Text, _>(package.data.JSProgram.as_str())
     .execute(&conn.0)
     .map_err(|err| -> String {
-        println!("Error querying package {}: {:?}", id, err);
-        "Error querying packages from the database".into()
+    println!("Error querying package {}: {:?}", id, err);
+    "Error querying packages from the database".into()
     })
-    .map(Json)?;
-    Ok(format!("updated {}.", updated_rows.0))
+    .map(Json)?;*/
+    Ok(format!("updated rows."))
 }
 
 #[delete("/package/<id>")]

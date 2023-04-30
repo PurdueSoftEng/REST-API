@@ -39,6 +39,7 @@ fn rocket() -> rocket::Rocket
                 routes::create_packages,
                 routes::list_packages,
                 routes::get_package,
+                routes::delete_package,
                 routes::update_package,
                 routes::create_group,
                 routes::list_groups
