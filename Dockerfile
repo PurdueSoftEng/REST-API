@@ -2,7 +2,7 @@ FROM ubuntu:jammy AS builder
 
 # Install dependencies
 RUN apt-get update && apt-get install -y curl libpq5 libpq-dev build-essential
-RUN apt-get update && apt-get install -y software-properties-common python3 pkg-config
+RUN apt-get update && apt-get install -y software-properties-common python3 pkg-config python-dev-is-python3
 
 # Install rust
 RUN curl https://sh.rustup.rs/ -sSf | \
