@@ -146,11 +146,11 @@ pub fn get_package(conn: DbConn, id: String) -> Result<String, String>  {
     Ok(serde_json::to_string(&pack).map(Json).unwrap().0)
 }
 
-#[put("/package/<id>")]
-pub fn update_package(conn: DbConn, id: String) -> Result<String, String>  {
+#[put("/package/<id>", data = "<package>")]
+pub fn update_package(conn: DbConn, id: String, package: Json<Package>,) -> Result<String, String>  {
     use crate::schema::packages::dsl::*;
     let updated_rows = diesel::update(packages.filter(package_name.eq(id.clone())))
-    .set(package_name.eq("New name"))
+    .set(package_name.eq("new".to_string()))
     .execute(&conn.0)
     .map_err(|err| -> String {
         println!("Error querying package {}: {:?}", id, err);
@@ -158,6 +158,12 @@ pub fn update_package(conn: DbConn, id: String) -> Result<String, String>  {
     })
     .map(Json)?;
     Ok(format!("updated {}.", updated_rows.0))
+}
+
+#[delete("/package/<id>")]
+pub fn delete_package(conn: DbConn, id: String) -> Result<String, String>  {
+    use crate::schema::packages::dsl::*;
+    Ok(format!("Will do"))
 }
 
 #[post("/group", data = "<group>")]
