@@ -13,7 +13,7 @@ jobs:
         runs-on: ubuntu-latest
         environment: test
         env:
-          IMAGE_NAME: gcr.io/${{secrets.GCP_PROJECT_ID}}/${{env.APP_NAME}}:latest
+          IMAGE_NAME: gcr.io/${{secrets.GCP_PROJECT_ID}}/${{vars.APP_NAME}}:latest
           ACCOUNT: ${{secrets.GCP_ACCOUNT_NAME}}@${{secrets.GCP_PROJECT_ID}}.iam.gserviceaccount.com
         steps:
         
