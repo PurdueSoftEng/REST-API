@@ -44,5 +44,5 @@ jobs:
           run: gcloud run deploy ${{secrets.GCP_PROJECT_ID}} --image $IMAGE_NAME --region us-central1
         
         - name: Update Service
-          run: gcloud run services update ${{env.APP_NAME}} --image $IMAGE_NAME --region us-central1
+          run: gcloud run services update ${{vars.APP_NAME}} --image $IMAGE_NAME --region us-central1
           
