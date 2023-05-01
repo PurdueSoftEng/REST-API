@@ -13,7 +13,7 @@ jobs:
         runs-on: ubuntu-latest
         environment: test
         env:
-          IMAGE_NAME: gcr.io/${{secrets.GCP_PROJECT_ID}}/${{secrets.GCP_APP_NAME}}
+          IMAGE_NAME: gcr.io/${{secrets.GCP_PROJECT_ID}}/${{env.APP_NAME}}:latest
           ACCOUNT: ${{secrets.GCP_ACCOUNT_NAME}}@${{secrets.GCP_PROJECT_ID}}.iam.gserviceaccount.com
         steps:
         
@@ -44,5 +44,5 @@ jobs:
           run: gcloud run deploy ${{secrets.GCP_PROJECT_ID}} --image $IMAGE_NAME --region us-central1
         
         - name: Update Service
-          run: gcloud run services update ${{secrets.GCP_APP_NAME}} --image $IMAGE_NAME --region us-central1
+          run: gcloud run services update ${{env.APP_NAME}} --image $IMAGE_NAME --region us-central1
           
