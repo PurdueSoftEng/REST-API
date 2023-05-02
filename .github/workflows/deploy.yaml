@@ -11,6 +11,7 @@ jobs:
     build:
         name: Run Docker
         runs-on: ubuntu-latest
+        environment: Test
         env:
           IMAGE_NAME: gcr.io/${{secrets.GCP_PROJECT_ID}}/${{vars.APP_NAME}}:latest
           ACCOUNT: ${{secrets.GCP_ACCOUNT_NAME}}@${{secrets.GCP_PROJECT_ID}}.iam.gserviceaccount.com
