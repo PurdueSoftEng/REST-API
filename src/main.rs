@@ -36,6 +36,7 @@ fn rocket() -> rocket::Rocket
             routes![
                 routes::index,
                 routes::hello,
+                routes::inject_package,
                 routes::create_package,
                 routes::query_package,
                 routes::list_packages,

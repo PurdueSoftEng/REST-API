@@ -7,6 +7,7 @@ use Default;
 #[derive(Serialize, Deserialize, Queryable)]
 pub struct PackageView {
     pub package_id: i32,
+    pub id: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub url: Option<String>,
     pub version: String,
@@ -16,26 +17,27 @@ pub struct PackageView {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub content: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub metric_one: Option<f32>,
+    pub ramp_up: Option<f32>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub metric_two: Option<f32>,
+    pub bus_factor: Option<f32>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub metric_three: Option<f32>,
+    pub resp_maintain: Option<f32>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub metric_four: Option<f32>,
+    pub license: Option<f32>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub metric_five: Option<f32>,
+    pub correct: Option<f32>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub metric_six: Option<f32>,
+    pub good_practice: Option<f32>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub metric_seven: Option<f32>,
+    pub pull_request: Option<f32>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub total_score: Option<f32>,
+    pub net_score: Option<f32>,
 }
 
 #[derive(Deserialize, Insertable)]
 #[table_name = "packages"]
 pub struct InsertablePackage {
+    pub id: String,
     pub version: String,
     pub package_name: String,
 }
@@ -43,6 +45,7 @@ pub struct InsertablePackage {
 #[derive(Deserialize, Insertable)]
 #[table_name = "packages"]
 pub struct InsertablePackageURL {
+    pub id: String,
     pub url: Option<String>,
     pub version: String,
     pub package_name: String,
@@ -52,6 +55,7 @@ pub struct InsertablePackageURL {
 #[derive(Deserialize, Insertable)]
 #[table_name = "packages"]
 pub struct InsertablePackageContent {
+    pub id: String,
     pub content: Option<String>,
     pub version: String,
     pub package_name: String,
@@ -61,14 +65,14 @@ pub struct InsertablePackageContent {
 #[derive(Deserialize, Insertable)]
 #[table_name = "packages"]
 pub struct InsertableMetrics {
-    pub metric_one: f32,
-    pub metric_two: f32,
-    pub metric_three: f32,
-    pub metric_four: f32,
-    pub metric_five: f32,
-    pub metric_six: f32,
-    pub metric_seven: f32,
-    pub total_score: f32,
+    pub ramp_up: f32,
+    pub bus_factor: f32,
+    pub resp_maintain: f32,
+    pub license: f32,
+    pub correct: f32,
+    pub good_practice: f32,
+    pub pull_request: f32,
+    pub net_score: f32,
 }
 
 #[derive(Default, Debug, Serialize, Deserialize, QueryableByName)]
@@ -89,8 +93,6 @@ pub struct GetMetaData {
     pub version: String,
     pub package_name: String,
 }
-
-
 
 #[derive(Serialize, Deserialize, Queryable)]
 pub struct GroupView {
@@ -134,6 +136,11 @@ pub struct InsertableRequest {
 pub struct PackageQuery {
     pub Name: String,
     pub Version: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct PackageRegEx {
+    pub Regex: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]

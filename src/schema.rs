@@ -10,8 +10,8 @@ diesel::table! {
 diesel::table! {
     history_log (history_id) {
         history_id -> Int4,
-        time_stamp -> Nullable<Timestamp>,
-        group_id -> Int4,
+        time_stamp -> Timestamp,
+        user_id -> Int4,
         package_id -> Int4,
         request_id -> Int4,
     }
@@ -20,19 +20,20 @@ diesel::table! {
 diesel::table! {
     packages (package_id) {
         package_id -> Int4,
+        id -> Varchar,
         url -> Nullable<Varchar>,
         version -> Varchar,
         package_name -> Varchar,
         jsprogram -> Nullable<Varchar>,
         content -> Nullable<Varchar>,
-        metric_one -> Nullable<Float4>,
-        metric_two -> Nullable<Float4>,
-        metric_three -> Nullable<Float4>,
-        metric_four -> Nullable<Float4>,
-        metric_five -> Nullable<Float4>,
-        metric_six -> Nullable<Float4>,
-        metric_seven -> Nullable<Float4>,
-        total_score -> Nullable<Float4>,
+        ramp_up -> Nullable<Float4>,
+        bus_factor -> Nullable<Float4>,
+        resp_maintain -> Nullable<Float4>,
+        license -> Nullable<Float4>,
+        correct -> Nullable<Float4>,
+        good_practice -> Nullable<Float4>,
+        pull_request -> Nullable<Float4>,
+        net_score -> Nullable<Float4>,
     }
 }
 
@@ -41,7 +42,6 @@ diesel::table! {
         registry_id -> Int4,
         group_id -> Int4,
         package_id -> Int4,
-        user_id -> Int4,
     }
 }
 
@@ -57,15 +57,15 @@ diesel::table! {
         user_id -> Int4,
         user_name -> Varchar,
         isadmin -> Bool,
+        token -> Varchar,
     }
 }
 
-diesel::joinable!(history_log -> groups (group_id));
 diesel::joinable!(history_log -> packages (package_id));
 diesel::joinable!(history_log -> requests (request_id));
+diesel::joinable!(history_log -> users (user_id));
 diesel::joinable!(registry -> groups (group_id));
 diesel::joinable!(registry -> packages (package_id));
-diesel::joinable!(registry -> users (user_id));
 
 diesel::allow_tables_to_appear_in_same_query!(
     groups,

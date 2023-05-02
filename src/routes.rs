@@ -16,31 +16,54 @@ use std::io::Cursor;
 
 #[get("/")]
 pub fn index() -> &'static str {
-    "Applicationsuccessfully started!"
+    "Application successfully started!"
 }
 
 #[get("/hello")]
 pub fn hello() -> &'static str {
     "Hello, world!"
 }
-//general_purpose::STANDARD_NO_PAD.decode(string).unwrap()
-#[post("/packages", data = "<package>")]
+
+#[post("/package/inject", data = "<package>")]
+pub fn inject_package(
+    conn: DbConn,
+    package: Json<InsertablePackage>,
+) -> Result<String, String> {
+    let inserted_rows = diesel::insert_into(schema::packages::table)
+        .values(&package.0)
+        .execute(&conn.0)
+        .map_err(|err| -> String {
+            println!("Error inserting row: {:?}", err);
+            "Error inserting row into database".into()
+        })?;
+
+    Ok(format!("Inserted {} row(s).", inserted_rows))
+}
+
+#[post("/packages?<name>", data = "<query>")]
 pub fn query_package(
     conn: DbConn,
-    package: Json<PackageQuery>,
+    query: Json<PackageQuery>,
+    name: String,
 ) -> Result<String, String> {
     use crate::schema::packages::dsl::*;
-    let insertable_package = InsertablePackage{package_name: package.Name.clone(), version: package.Version.clone()};
+    /*let insertable_package = InsertablePackage{package_name: package.Name.clone(), version: package.Version.clone()};
     let inserted_rows = diesel::insert_into(packages)
         .values(&insertable_package)
         .execute(&conn.0)
         .map_err(|err| -> String {
             println!("Error inserting row: {:?}", err);
             "Error inserting row into database".into()
-        })?;
-    
-    
-    Ok(format!("Inserted {} row(s).", inserted_rows))
+        })?;*/
+    let mut get_meta: Json<Vec<GetMetaData>> = diesel::sql_query("SELECT id, version, package_name FROM packages LIMIT $1")
+    .bind::<diesel::sql_types::Integer, _>(name.parse::<i32>().unwrap())
+    .get_results(&conn.0)
+    .map_err(|err| -> String {
+        println!("Error querying packages: {:?}", err);
+        "Error querying packages from the database".into()
+    })
+    .map(Json)?;
+    Ok(format!("I found these entries: {:?}", get_meta.0))
 }
 
 #[post("/package", data = "<package>")]
@@ -61,7 +84,7 @@ pub fn create_package(
     let decoded = general_purpose::STANDARD_NO_PAD.decode(package.Content.clone().unwrap().as_bytes()).unwrap();*/
     if package.Content.is_none() && package.URL.is_some()
     {
-        let insertable_package1 = InsertablePackageURL{package_name: "Temp Name".to_string(), version: "1.0.0".to_string(), url: Some(package.URL.clone().unwrap_or_default()), jsprogram: Some(package.JSProgram.clone().unwrap_or_default())};
+        let insertable_package1 = InsertablePackageURL{id: "temp".to_string(), package_name: "Temp Name".to_string(), version: "1.0.0".to_string(), url: Some(package.URL.clone().unwrap_or_default()), jsprogram: Some(package.JSProgram.clone().unwrap_or_default())};
         let inserted_rows1 = diesel::insert_into(packages)
         .values(&insertable_package1)
         .execute(&conn.0)
@@ -75,7 +98,7 @@ pub fn create_package(
     }
     else if package.URL.is_none() && package.Content.is_some() 
     {
-        let insertable_package2 = InsertablePackageContent{package_name: "Temp Name".to_string(), version: "1.0.0".to_string(), content: Some(package.Content.clone().unwrap_or_default()), jsprogram: Some(package.JSProgram.clone().unwrap_or_default())};
+        let insertable_package2 = InsertablePackageContent{id: "temp".to_string(), package_name: "Temp Name".to_string(), version: "1.0.0".to_string(), content: Some(package.Content.clone().unwrap_or_default()), jsprogram: Some(package.JSProgram.clone().unwrap_or_default())};
         let inserted_rows2 = diesel::insert_into(packages)
         .values(&insertable_package2)
         .execute(&conn.0)
@@ -121,14 +144,14 @@ pub fn list_packages(conn: DbConn) -> Result<String, String> {
 
 #[get("/package/<id>")]
 pub fn get_package(conn: DbConn, id: String) -> Result<String, String>  {
-    let mut get_meta: Json<Vec<GetMetaData>> = diesel::sql_query("SELECT * FROM packages WHERE package_name=$1").bind::<diesel::sql_types::Text, _>(id.as_str())
+    let mut get_meta: Json<Vec<GetMetaData>> = diesel::sql_query("SELECT * FROM packages WHERE id=$1").bind::<diesel::sql_types::Text, _>(id.as_str())
     .get_results(&conn.0)
     .map_err(|err| -> String {
         println!("Error querying package {}: {:?}", id, err);
         "Error querying packages from the database".into()
     })
     .map(Json)?;
-    let get_data: Json<Vec<GetData>> = diesel::sql_query("SELECT * FROM packages WHERE package_name=$1").bind::<diesel::sql_types::Text, _>(id.as_str())
+    let mut get_data: Json<Vec<GetData>> = diesel::sql_query("SELECT * FROM packages WHERE id=$1").bind::<diesel::sql_types::Text, _>(id.as_str())
     .get_results(&conn.0)
     .map_err(|err| -> String {
         println!("Error querying package {}: {:?}", id, err);
@@ -141,8 +164,8 @@ pub fn get_package(conn: DbConn, id: String) -> Result<String, String>  {
     {
         //let data = PackageData{Content: Some(get_data.0.pop().unwrap().content.unwrap()), URL: Some(get_data.0.pop().unwrap().url.unwrap()), JSProgram: Some(get_data.0.pop().unwrap().jsprogram.unwrap())};        
     }*/
-    let data1 = PackageData{Content: None, URL: None, JSProgram: None};
-    let pack = Package{metadata: meta, data: data1};
+    let data = PackageData{Content: Some(get_data.0.pop().unwrap().content.unwrap_or_default()), URL: Some(get_data.0.pop().unwrap().url.unwrap_or_default()), JSProgram: Some(get_data.0.pop().unwrap().jsprogram.unwrap_or_default())};
+    let pack = Package{metadata: meta, data: data};
     Ok(serde_json::to_string(&pack).map(Json).unwrap().0)
 }
 
@@ -165,9 +188,57 @@ pub fn update_package(conn: DbConn, id: String, package: Json<Package>,) -> Resu
 }
 
 #[delete("/package/<id>")]
-pub fn delete_package(conn: DbConn, id: String) -> Result<String, String>  {
+pub fn delete_package(conn: DbConn, id: String) -> Result<String, String>  
+{
     use crate::schema::packages::dsl::*;
-    Ok(format!("Will do"))
+    Ok(format!("Not supported"))
+}
+
+#[get("/package/<id>/rate")]
+pub fn get_rating(conn: DbConn, id: String) -> Result<String, String>  {
+    let mut get_meta: Json<Vec<GetMetaData>> = diesel::sql_query("SELECT * FROM packages WHERE id=$1").bind::<diesel::sql_types::Text, _>(id.as_str())
+    .get_results(&conn.0)
+    .map_err(|err| -> String {
+        println!("Error querying package {}: {:?}", id, err);
+        "Error querying packages from the database".into()
+    })
+    .map(Json)?;
+    let mut get_data: Json<Vec<GetData>> = diesel::sql_query("SELECT * FROM packages WHERE id=$1").bind::<diesel::sql_types::Text, _>(id.as_str())
+    .get_results(&conn.0)
+    .map_err(|err| -> String {
+        println!("Error querying package {}: {:?}", id, err);
+        "Error querying packages from the database".into()
+    })
+    .map(Json)?;
+    print!("{:?}", get_data.0);
+    let meta = PackageMetaData{ID: get_meta.0.pop().unwrap().package_id.to_string(), Name: get_meta.0.pop().unwrap().package_name, Version: get_meta.0.pop().unwrap().version};
+    /*if get_data.0.pop().unwrap().content.is_some() && get_data.0.pop().unwrap().jsprogram.is_some() && get_data.0.pop().unwrap().url.is_some()
+    {
+        //let data = PackageData{Content: Some(get_data.0.pop().unwrap().content.unwrap()), URL: Some(get_data.0.pop().unwrap().url.unwrap()), JSProgram: Some(get_data.0.pop().unwrap().jsprogram.unwrap())};        
+    }*/
+    let data = PackageData{Content: Some(get_data.0.pop().unwrap().content.unwrap_or_default()), URL: Some(get_data.0.pop().unwrap().url.unwrap_or_default()), JSProgram: Some(get_data.0.pop().unwrap().jsprogram.unwrap_or_default())};
+    let pack = Package{metadata: meta, data: data};
+    Ok(serde_json::to_string(&pack).map(Json).unwrap().0)
+}
+
+#[post("/package/byRegEx", data = "<regex>")]
+pub fn search_regex(conn: DbConn, regex: Json<PackageRegEx>) -> Result<String, String>
+{
+    use crate::schema::packages::dsl::*;
+    Ok(format!("Not supported"))
+}
+
+#[post("/authenticate")]
+pub fn auth(conn: DbConn) -> Result<String, String>
+{
+    Ok(format!("Not supported"))
+}
+
+#[post("/reset")]
+pub fn reset(conn: DbConn) -> Result<String, String>
+{
+    use crate::schema::packages::dsl::*;
+    Ok(format!("Not supported"))
 }
 
 #[post("/group", data = "<group>")]

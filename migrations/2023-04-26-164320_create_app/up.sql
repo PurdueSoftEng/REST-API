@@ -1,18 +1,19 @@
 CREATE TABLE packages (
   package_id SERIAL,
+  id VARCHAR NOT NULL,
   url VARCHAR,
   version VARCHAR NOT NULL,
   package_name VARCHAR NOT NULL,
   jsprogram VARCHAR,
   content VARCHAR,
-  metric_one REAL,
-  metric_two REAL,
-  metric_three REAL,
-  metric_four REAL,
-  metric_five REAL,
-  metric_six REAL,
-  metric_seven REAL,
-  total_score REAL,
+  ramp_up REAL,
+  bus_factor REAL,
+  resp_maintain REAL,
+  license REAL,
+  correct REAL,
+  good_practice REAL,
+  pull_request REAL,
+  net_score REAL,
   PRIMARY KEY(package_id)
 );
 
@@ -20,6 +21,7 @@ CREATE TABLE users (
   user_id SERIAL,
   user_name VARCHAR NOT NULL,
   isAdmin BOOLEAN NOT NULL,
+  token VARCHAR NOT NULL,
   PRIMARY KEY(user_id)
 );
 
@@ -37,8 +39,8 @@ CREATE TABLE groups (
 
 CREATE TABLE history_log (
   history_id SERIAL,
-  time_stamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  group_id INT NOT NULL,
+  time_stamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+  user_id INT NOT NULL,
   package_id INT NOT NULL,
   request_id INT NOT NULL,
   PRIMARY KEY(history_id)
@@ -48,14 +50,13 @@ CREATE TABLE registry (
   registry_id SERIAL,
   group_id INT NOT NULL,
   package_id INT NOT NULL,
-  user_id INT NOT NULL,
   PRIMARY KEY(registry_id)
 );
 
 ALTER TABLE history_log
-    ADD CONSTRAINT history_log_group_id 
-    FOREIGN KEY (group_id) 
-    REFERENCES groups(group_id) 
+    ADD CONSTRAINT history_log_user_id 
+    FOREIGN KEY (user_id) 
+    REFERENCES users(user_id) 
     ON UPDATE CASCADE ON DELETE RESTRICT;
 
 ALTER TABLE history_log
@@ -82,8 +83,7 @@ ALTER TABLE registry
     REFERENCES packages(package_id) 
     ON UPDATE CASCADE ON DELETE RESTRICT;
 
-ALTER TABLE registry
-    ADD CONSTRAINT registry_user_id 
-    FOREIGN KEY (user_id) 
-    REFERENCES users(user_id) 
-    ON UPDATE CASCADE ON DELETE RESTRICT;
+INSERT INTO requests (request_type) VALUES ('CREATE');
+INSERT INTO requests (request_type) VALUES ('UPDATE');
+INSERT INTO requests (request_type) VALUES ('RATE');
+INSERT INTO requests (request_type) VALUES ('DOWNLOAD');
