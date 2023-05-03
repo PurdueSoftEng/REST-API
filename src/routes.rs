@@ -2,7 +2,8 @@ use diesel::sql_types::Text;
 use diesel::{self, prelude::*};
 
 use rocket::http::Status;
-use rocket::response;
+use rocket::Response;
+use rocket::response::{self, Responder};
 use rocket_contrib::json::Json;
 
 use crate::models::*;
@@ -17,7 +18,8 @@ use std::io::Cursor;
 
 
 #[get("/")]
-pub fn index() -> &'static str {
+pub fn index(conn: DbConn) -> &'static str {
+
     "Application successfully started!"
 }
 
@@ -96,7 +98,7 @@ pub fn create_package(
         })?;
     
     
-        Ok(format!("Inserted Temp Name."))
+        Ok(format!("Inserted Temp Name"))
     }
     else 
     {
@@ -146,15 +148,22 @@ pub fn get_package(conn: DbConn, id: String) -> Result<String, String>  {
         "Error querying packages from the database".into()
     })
     .map(Json)?;
-    print!("{:?}", get_data.0);
-    let meta = PackageMetaData{ID: get_meta.0.pop().unwrap().package_id.to_string(), Name: get_meta.0.pop().unwrap().package_name, Version: get_meta.0.pop().unwrap().version};
+    if get_meta.0.is_empty()
+    {
+        Ok(format!("Package Not Registered"))
+    }
+    else 
+    {
+        Ok(format!("Package Registered"))
+    }
+    //let meta = PackageMetaData{ID: get_meta.0.pop().unwrap().package_id.to_string(), Name: get_meta.0.pop().unwrap().package_name, Version: get_meta.0.pop().unwrap().version};
     /*if get_data.0.pop().unwrap().content.is_some() && get_data.0.pop().unwrap().jsprogram.is_some() && get_data.0.pop().unwrap().url.is_some()
     {
         //let data = PackageData{Content: Some(get_data.0.pop().unwrap().content.unwrap()), URL: Some(get_data.0.pop().unwrap().url.unwrap()), JSProgram: Some(get_data.0.pop().unwrap().jsprogram.unwrap())};        
     }*/
     //let data = PackageData{Content: Some(get_data.0.pop().unwrap().content.unwrap_or_default()), URL: Some(get_data.0.pop().unwrap().url.unwrap_or_default()), JSProgram: Some(get_data.0.pop().unwrap().jsprogram.unwrap_or_default())};
-    let pack = Package{metadata: meta, data: PackageData{Content: None, URL: None, JSProgram: None}};
-    Ok(serde_json::to_string(&pack).map(Json).unwrap().0)
+    //let pack = Package{metadata: meta, data: PackageData{Content: "", URL: "", JSProgram: ""}};
+    //Ok(serde_json::to_string(&pack).map(Json).unwrap().0)
 }
 
 #[put("/package/<id>", data = "<package>")]
@@ -238,11 +247,10 @@ pub fn auth(conn: DbConn) -> Result<String, String>
 }
 
 #[delete("/reset")]
-pub fn reset(conn: DbConn) -> Result<String, String>
+pub fn reset(conn: DbConn)
 {
-    use crate::schema::packages::dsl::*;
-    Ok(format!("Not supported"))
-}
+    //Response::build().raw_status(331, "An Error")
+} 
 
 #[post("/group", data = "<group>")]
 pub fn create_group(
