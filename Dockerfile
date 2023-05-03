@@ -4,32 +4,32 @@ FROM ubuntu:jammy AS builder
 RUN apt-get update && apt-get install -y curl libpq5 libpq-dev build-essential
 RUN apt-get update && apt-get install -y software-properties-common python3 pkg-config python-dev-is-python3
 
-# # Install rust
-# RUN curl https://sh.rustup.rs/ -sSf | \
-#   sh -s -- -y --default-toolchain nightly
+# Install rust
+RUN curl https://sh.rustup.rs/ -sSf | \
+  sh -s -- -y --default-toolchain nightly
 
-# ENV PATH="/root/.cargo/bin:${PATH}"
+ENV PATH="/root/.cargo/bin:${PATH}"
 
-# ADD . ./
+ADD . ./
 
-# RUN cargo build --release
+RUN cargo build --release
 
-# FROM ubuntu:jammy
+FROM ubuntu:jammy
 
-# # Install dependencies
-# RUN apt-get update && apt-get install -y libpq5 libpq-dev 
-# RUN apt-get update && apt-get install -y sudo 
-# RUN apt-get update && apt-get install -y software-properties-common python3 pkg-config
+# Install dependencies
+RUN apt-get update && apt-get install -y libpq5 libpq-dev 
+RUN apt-get update && apt-get install -y sudo 
+RUN apt-get update && apt-get install -y software-properties-common python3 pkg-config
 
-# # Setup sudo
-# RUN useradd -m docker && echo "docker:docker" | chpasswd && adduser docker sudo
+# Setup sudo
+RUN useradd -m docker && echo "docker:docker" | chpasswd && adduser docker sudo
 
-# # Install binary
-# COPY --from=builder \
-#   /target/release/tool-app \
-#   /usr/local/bin/
+# Install binary
+COPY --from=builder \
+  /target/release/tool-app \
+  /usr/local/bin/
 
-# ENV PORT 8080
+ENV PORT 8080
 
-# WORKDIR /root
-# CMD ROCKET_PORT=$PORT /usr/local/bin/tool-app
+WORKDIR /root
+CMD ROCKET_PORT=$PORT /usr/local/bin/tool-app
