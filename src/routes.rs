@@ -246,7 +246,7 @@ pub fn auth(conn: DbConn) -> Result<String, String> {
             let message = format!("Error handling request: {:?}", status);
             String::from(message)
         })
-        .map(|_| "This system does not support authentication.".into())
+        .map(|string: String| "This system does not support authentication.".into())
 }
 
 #[delete("/reset")]
