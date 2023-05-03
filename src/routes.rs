@@ -1,6 +1,7 @@
 use diesel::sql_types::Text;
 use diesel::{self, prelude::*};
 
+use rocket::http::Status;
 use rocket_contrib::json::Json;
 
 use crate::models::*;
@@ -194,7 +195,7 @@ pub fn delete_package(conn: DbConn, id: String) -> Result<String, String>
     Ok(format!("Not supported"))
 }
 
-#[get("/package/<id>/rate")]
+#[get("/package/<id>/rate", rank = 2)]
 pub fn get_rating(conn: DbConn, id: String) -> Result<String, String>  {
     let mut get_meta: Json<Vec<GetMetaData>> = diesel::sql_query("SELECT * FROM packages WHERE id=$1").bind::<diesel::sql_types::Text, _>(id.as_str())
     .get_results(&conn.0)
@@ -228,9 +229,24 @@ pub fn search_regex(conn: DbConn, regex: Json<PackageRegEx>) -> Result<String, S
     Ok(format!("Not supported"))
 }
 
+#[get("/package/byName/<name>", rank = 1)]
+pub fn get_hist(conn: DbConn, name: String) -> Result<String, String>
+{
+    use crate::schema::packages::dsl::*;
+    Ok(format!("Not supported"))
+}
+
+#[delete("/package/byName/<name>")]
+pub fn delete_hist(conn: DbConn, name: String) -> Result<String, String>
+{
+    use crate::schema::packages::dsl::*;
+    Ok(format!("Not supported"))
+}
+
 #[post("/authenticate")]
 pub fn auth(conn: DbConn) -> Result<String, String>
 {
+    Status::NoContent;
     Ok(format!("Not supported"))
 }
 
@@ -238,6 +254,7 @@ pub fn auth(conn: DbConn) -> Result<String, String>
 pub fn reset(conn: DbConn) -> Result<String, String>
 {
     use crate::schema::packages::dsl::*;
+    Status::SeeOther;
     Ok(format!("Not supported"))
 }
 

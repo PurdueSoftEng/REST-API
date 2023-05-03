@@ -43,6 +43,12 @@ fn rocket() -> rocket::Rocket
                 routes::get_package,
                 routes::delete_package,
                 routes::update_package,
+                routes::get_rating,
+                routes::search_regex,
+                routes::get_hist,
+                routes::delete_hist,
+                routes::auth,
+                routes::reset,
                 routes::create_group,
                 routes::list_groups
             ],
