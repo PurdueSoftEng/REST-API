@@ -49,3 +49,4 @@ jobs:
         - name: Update Service
           run: gcloud run services update ${{vars.APP_NAME}} --image $IMAGE_NAME --region us-central1
           
+          
