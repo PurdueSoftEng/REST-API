@@ -2,6 +2,7 @@ use diesel::sql_types::Text;
 use diesel::{self, prelude::*};
 
 use rocket::http::Status;
+use rocket::response;
 use rocket_contrib::json::Json;
 
 use crate::models::*;
@@ -38,7 +39,7 @@ pub fn inject_package(
             "Error inserting row into database".into()
         })?;
 
-    Ok(format!("Inserted {} row(s).", inserted_rows))
+    Ok(format!("Inserted {}.", package.package_name))
 }
 
 #[post("/packages?<name>", data = "<query>")]
@@ -83,10 +84,10 @@ pub fn create_package(
     let mut result = Vec::new();
     let decoded1 = decoder.read_to_end(&mut result).unwrap();
     let decoded = general_purpose::STANDARD_NO_PAD.decode(package.Content.clone().unwrap().as_bytes()).unwrap();*/
-    if package.Content.is_none() && package.URL.is_some()
+    if package.Content.is_some() || package.URL.is_some()
     {
         let insertable_package1 = InsertablePackageURL{id: "temp".to_string(), package_name: "Temp Name".to_string(), version: "1.0.0".to_string(), url: Some(package.URL.clone().unwrap_or_default()), jsprogram: Some(package.JSProgram.clone().unwrap_or_default())};
-        let inserted_rows1 = diesel::insert_into(packages)
+        diesel::insert_into(packages)
         .values(&insertable_package1)
         .execute(&conn.0)
         .map_err(|err| -> String {
@@ -95,21 +96,7 @@ pub fn create_package(
         })?;
     
     
-        Ok(format!("Inserted {} row(s).", inserted_rows1))
-    }
-    else if package.URL.is_none() && package.Content.is_some() 
-    {
-        let insertable_package2 = InsertablePackageContent{id: "temp".to_string(), package_name: "Temp Name".to_string(), version: "1.0.0".to_string(), content: Some(package.Content.clone().unwrap_or_default()), jsprogram: Some(package.JSProgram.clone().unwrap_or_default())};
-        let inserted_rows2 = diesel::insert_into(packages)
-        .values(&insertable_package2)
-        .execute(&conn.0)
-        .map_err(|err| -> String {
-            println!("Error inserting row: {:?}", err);
-            "Error inserting row into database".into()
-        })?;
-    
-    
-        Ok(format!("Inserted {} row(s).", inserted_rows2))
+        Ok(format!("Inserted Temp Name."))
     }
     else 
     {
@@ -165,8 +152,8 @@ pub fn get_package(conn: DbConn, id: String) -> Result<String, String>  {
     {
         //let data = PackageData{Content: Some(get_data.0.pop().unwrap().content.unwrap()), URL: Some(get_data.0.pop().unwrap().url.unwrap()), JSProgram: Some(get_data.0.pop().unwrap().jsprogram.unwrap())};        
     }*/
-    let data = PackageData{Content: Some(get_data.0.pop().unwrap().content.unwrap_or_default()), URL: Some(get_data.0.pop().unwrap().url.unwrap_or_default()), JSProgram: Some(get_data.0.pop().unwrap().jsprogram.unwrap_or_default())};
-    let pack = Package{metadata: meta, data: data};
+    //let data = PackageData{Content: Some(get_data.0.pop().unwrap().content.unwrap_or_default()), URL: Some(get_data.0.pop().unwrap().url.unwrap_or_default()), JSProgram: Some(get_data.0.pop().unwrap().jsprogram.unwrap_or_default())};
+    let pack = Package{metadata: meta, data: PackageData{Content: None, URL: None, JSProgram: None}};
     Ok(serde_json::to_string(&pack).map(Json).unwrap().0)
 }
 
@@ -243,18 +230,17 @@ pub fn delete_hist(conn: DbConn, name: String) -> Result<String, String>
     Ok(format!("Not supported"))
 }
 
-#[post("/authenticate")]
+#[put("/authenticate")]
 pub fn auth(conn: DbConn) -> Result<String, String>
 {
     Status::NoContent;
     Ok(format!("Not supported"))
 }
 
-#[post("/reset")]
+#[delete("/reset")]
 pub fn reset(conn: DbConn) -> Result<String, String>
 {
     use crate::schema::packages::dsl::*;
-    Status::SeeOther;
     Ok(format!("Not supported"))
 }
 

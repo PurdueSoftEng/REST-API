@@ -36,6 +36,25 @@ pub struct PackageView {
 
 #[derive(Deserialize, Insertable)]
 #[table_name = "packages"]
+pub struct InjectablePackage {
+    pub id: String,
+    pub url: String,
+    pub version: String,
+    pub package_name: String,
+    pub jsprogram: String,
+    pub content: String,
+    pub ramp_up: f32,
+    pub bus_factor: f32,
+    pub resp_maintain: f32,
+    pub license: f32,
+    pub correct: f32,
+    pub good_practice: f32,
+    pub pull_request: f32,
+    pub net_score: f32,
+}
+
+#[derive(Deserialize, Insertable)]
+#[table_name = "packages"]
 pub struct InsertablePackage {
     pub id: String,
     pub version: String,
