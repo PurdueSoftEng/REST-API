@@ -25,7 +25,7 @@ pub fn index(conn: DbConn) -> &'static str {
 
 #[get("/hello")]
 pub fn hello() -> &'static str {
-    "Hello, world!"
+    "Howdy, world!"
 }
 
 #[post("/package/inject", data = "<package>")]
