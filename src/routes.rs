@@ -240,10 +240,10 @@ pub fn delete_hist(conn: DbConn, name: String) -> Result<String, String>
 }
 
 #[put("/authenticate")]
-pub fn auth(conn: DbConn) -> Result<String, String>
-{
-    Status::NoContent;
-    Ok(format!("Not supported"))
+pub fn auth(conn: DbConn) -> Result<String, String> {
+    Err(Status::NotImplemented)
+        .map_err(|e| format!("Error handling request: {}", e))
+        .map(|_| "This system does not support authentication.".into())
 }
 
 #[delete("/reset")]
