@@ -17,7 +17,7 @@ jobs:
           ACCOUNT: ${{secrets.GCP_ACCOUNT_NAME}}@${{secrets.GCP_PROJECT_ID}}.iam.gserviceaccount.com
         steps:
         
-        - name: Login
+        - id: auth
           uses: 'google-github-actions/auth@v1'
           with:
               project_id: ${{secrets.GCP_PROJECT_ID}}
