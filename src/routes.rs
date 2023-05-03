@@ -242,7 +242,10 @@ pub fn delete_hist(conn: DbConn, name: String) -> Result<String, String>
 #[put("/authenticate")]
 pub fn auth(conn: DbConn) -> Result<String, String> {
     Err(Status::NotImplemented)
-        .map_err(|e| format!("Error handling request: {}", e))
+        .map_err(|status| {
+            let message = format!("Error handling request: {:?}", status);
+            String::from(message)
+        })
         .map(|_| "This system does not support authentication.".into())
 }
 
